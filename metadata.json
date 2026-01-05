@@ -1,0 +1,5 @@
+{
+  "name": "Badminton Tournament Points Table v1.1",
+  "description": "A rule-based tournament scoring tool for tracking match results, calculating points, and generating rankings for a 5-team round-robin tournament.",
+  "requestFramePermissions": []
+}
