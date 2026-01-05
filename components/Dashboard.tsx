@@ -16,6 +16,25 @@ const Dashboard: React.FC<DashboardProps> = ({ matches, onEnterResult, onResetCl
   const progress = (completed / total) * 100;
   const roundRobinDone = completed === total;
 
+  const handleShare = async () => {
+    const shareData = {
+      title: 'Badminton Tournament Live Table',
+      text: 'Check out the live points table and rankings for our badminton tournament!',
+      url: window.location.href,
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(window.location.href);
+        alert('Link copied to clipboard! Share it with your friends.');
+      }
+    } catch (err) {
+      console.error('Error sharing:', err);
+    }
+  };
+
   return (
     <div className="space-y-4 sm:space-y-8">
       {champion ? (
@@ -26,12 +45,20 @@ const Dashboard: React.FC<DashboardProps> = ({ matches, onEnterResult, onResetCl
             <div className="text-2xl sm:text-3xl font-black tracking-tight mb-4 uppercase">Championship Title</div>
             <div className="text-3xl sm:text-5xl font-black drop-shadow-lg mb-8">{champion.name}</div>
             
-            <button 
-              onClick={onViewPoster}
-              className="w-full sm:w-auto px-8 py-4 bg-slate-900 text-white rounded-full font-black text-xs sm:text-sm uppercase tracking-widest shadow-2xl hover:bg-slate-800 transition-all hover:scale-105 active:scale-95"
-            >
-              View Victory Poster
-            </button>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <button 
+                onClick={onViewPoster}
+                className="px-8 py-4 bg-slate-900 text-white rounded-full font-black text-xs sm:text-sm uppercase tracking-widest shadow-2xl hover:bg-slate-800 transition-all hover:scale-105 active:scale-95"
+              >
+                View Victory Poster
+              </button>
+              <button 
+                onClick={handleShare}
+                className="px-8 py-4 bg-white/20 text-white border border-white/30 rounded-full font-black text-xs sm:text-sm uppercase tracking-widest hover:bg-white/30 transition-all"
+              >
+                Share Results 🚀
+              </button>
+            </div>
           </div>
           <div className="p-4 sm:p-6 bg-slate-50 text-center">
             <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest">Victory Declared • Session 2024</p>
@@ -43,9 +70,12 @@ const Dashboard: React.FC<DashboardProps> = ({ matches, onEnterResult, onResetCl
             <h2 className="text-lg sm:text-2xl font-black text-slate-800 uppercase tracking-tighter">
               {roundRobinDone ? 'Knockouts' : 'Round Robin'}
             </h2>
-            <span className={`px-3 py-1 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-wider border-2 ${roundRobinDone ? 'bg-green-50 border-green-200 text-green-700' : 'bg-indigo-50 border-indigo-200 text-indigo-700'}`}>
-              {roundRobinDone ? 'Ready' : 'Progress'}
-            </span>
+            <button 
+              onClick={handleShare}
+              className="px-4 py-2 bg-indigo-50 text-indigo-600 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-indigo-100 transition-all flex items-center gap-2"
+            >
+              <span>🔗</span> Share Link
+            </button>
           </div>
           
           <div className="space-y-4">

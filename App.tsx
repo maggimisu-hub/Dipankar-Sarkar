@@ -1,14 +1,14 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { TEAMS, INITIAL_MATCHES } from './constants';
-import { Match, TeamStats, RankingEntry, Screen } from './types';
-import Dashboard from './components/Dashboard';
-import MatchEntry from './components/MatchEntry';
-import PointsTable from './components/PointsTable';
-import Rankings from './components/Rankings';
-import Semifinals from './components/Semifinals';
-import ResetModal from './components/ResetModal';
-import ChampionPoster from './components/ChampionPoster';
+import { TEAMS, INITIAL_MATCHES } from './constants.ts';
+import { Match, TeamStats, RankingEntry, Screen } from './types.ts';
+import Dashboard from './components/Dashboard.tsx';
+import MatchEntry from './components/MatchEntry.tsx';
+import PointsTable from './components/PointsTable.tsx';
+import Rankings from './components/Rankings.tsx';
+import Semifinals from './components/Semifinals.tsx';
+import ResetModal from './components/ResetModal.tsx';
+import ChampionPoster from './components/ChampionPoster.tsx';
 
 const App: React.FC = () => {
   const [matches, setMatches] = useState<Match[]>(INITIAL_MATCHES);
@@ -48,22 +48,15 @@ const App: React.FC = () => {
   }, [matches]);
 
   const rankings = useMemo((): RankingEntry[] => {
-    // 1. Sort by Points (Wins)
-    // 2. Tie-breaker: Head-to-Head
     const sorted = [...teamStats].sort((a, b) => {
       if (b.points !== a.points) return b.points - a.points;
-
-      // Check H2H match
       const h2hMatch = matches.find(m => 
         (m.teamAId === a.teamId && m.teamBId === b.teamId) || 
         (m.teamAId === b.teamId && m.teamBId === a.teamId)
       );
-
       if (h2hMatch && h2hMatch.winnerId !== null) {
         return h2hMatch.winnerId === a.teamId ? -1 : 1;
       }
-
-      // 3. Fallback: Deterministic (Team ID) - but we will flag this as a critical tie if it's at the boundary
       return a.teamId - b.teamId;
     });
 
@@ -78,21 +71,8 @@ const App: React.FC = () => {
     if (rankings.length < 5) return false;
     const r4 = rankings[3];
     const r5 = rankings[4];
-
-    // Tied on wins?
-    if (r4.points !== r5.points) return false;
-
-    // Is there a clear H2H winner?
-    const h2h = matches.find(m => 
-      (m.teamAId === r4.teamId && m.teamBId === r5.teamId) || 
-      (m.teamAId === r5.teamId && m.teamBId === r4.teamId)
-    );
-
-    // If H2H is null (not played) or if the tie is part of a larger circle (3+ way tie), it's critical.
-    // In a 5-way tie, even if H2H is found, the circle might invalidate the sequence.
-    // Standard rule: If Points are equal at Rank 4/5, it's a conflict for the organizer to verify.
     return r4.points === r5.points;
-  }, [rankings, matches]);
+  }, [rankings]);
 
   const allMatchesCompleted = matches.every(m => m.winnerId !== null);
   const champion = useMemo(() => finalWinnerId ? TEAMS.find(t => t.id === finalWinnerId) : null, [finalWinnerId]);
