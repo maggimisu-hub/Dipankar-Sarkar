@@ -17,12 +17,15 @@ const ChampionPoster: React.FC<ChampionPosterProps> = ({ champion, onClose }) =>
     
     setIsDownloading(true);
     try {
+      // Small delay to ensure render stability
       await new Promise(resolve => setTimeout(resolve, 100));
       
       const dataUrl = await htmlToImage.toPng(posterRef.current, {
         quality: 1.0,
         pixelRatio: 2,
         backgroundColor: '#020617',
+        cacheBust: true, // Forces fetch to bypass cache, fixing some CORS issues
+        skipAutoScale: true, // Improves consistency
       });
 
       const link = document.createElement('a');

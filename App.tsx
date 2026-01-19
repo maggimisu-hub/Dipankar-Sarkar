@@ -68,6 +68,7 @@ const App: React.FC = () => {
   }, [teamStats, matches]);
 
   const hasCriticalTie = useMemo(() => {
+    // Only applies if there are enough teams to have a cutoff
     if (rankings.length < 5) return false;
     const r4 = rankings[3];
     const r5 = rankings[4];
@@ -86,6 +87,23 @@ const App: React.FC = () => {
     setActiveScreen(Screen.PointsTable);
   };
 
+  const handleShuffleMatches = () => {
+    if (matches.some(m => m.winnerId !== null)) {
+      if (!window.confirm("Some matches are already recorded. Shuffling now will only reorder the list, not reset scores. Continue?")) {
+        return;
+      }
+    }
+    
+    setMatches(prev => {
+      const shuffled = [...prev];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      return shuffled;
+    });
+  };
+
   const handleReset = () => {
     setMatches(INITIAL_MATCHES);
     setSemi1WinnerId(null);
@@ -99,7 +117,16 @@ const App: React.FC = () => {
   const renderScreen = () => {
     switch (activeScreen) {
       case Screen.Dashboard:
-        return <Dashboard matches={matches} onEnterResult={() => setActiveScreen(Screen.MatchEntry)} onResetClick={() => setShowResetModal(true)} onViewPoster={() => setShowGrandPoster(true)} champion={champion} />;
+        return (
+          <Dashboard 
+            matches={matches} 
+            onEnterResult={() => setActiveScreen(Screen.MatchEntry)} 
+            onResetClick={() => setShowResetModal(true)} 
+            onViewPoster={() => setShowGrandPoster(true)} 
+            onShuffle={handleShuffleMatches}
+            champion={champion} 
+          />
+        );
       case Screen.MatchEntry:
         return <MatchEntry matches={matches} teams={TEAMS} onSave={handleSaveResult} onCancel={() => setActiveScreen(Screen.Dashboard)} />;
       case Screen.PointsTable:
@@ -109,7 +136,16 @@ const App: React.FC = () => {
       case Screen.Semifinals:
         return <Semifinals rankings={rankings} allCompleted={allMatchesCompleted} hasCriticalTie={hasCriticalTie} semi1WinnerId={semi1WinnerId} semi2WinnerId={semi2WinnerId} finalWinnerId={finalWinnerId} onSetSemi1Winner={setSemi1WinnerId} onSetSemi2Winner={setSemi2WinnerId} onSetFinalWinner={setFinalWinnerId} teams={TEAMS} />;
       default:
-        return <Dashboard matches={matches} onEnterResult={() => setActiveScreen(Screen.MatchEntry)} onResetClick={() => setShowResetModal(true)} onViewPoster={() => setShowGrandPoster(true)} champion={champion} />;
+        return (
+          <Dashboard 
+            matches={matches} 
+            onEnterResult={() => setActiveScreen(Screen.MatchEntry)} 
+            onResetClick={() => setShowResetModal(true)} 
+            onViewPoster={() => setShowGrandPoster(true)} 
+            onShuffle={handleShuffleMatches}
+            champion={champion} 
+          />
+        );
     }
   };
 

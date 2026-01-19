@@ -7,10 +7,11 @@ interface DashboardProps {
   onEnterResult: () => void;
   onResetClick: () => void;
   onViewPoster: () => void;
+  onShuffle: () => void;
   champion?: Team | null;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ matches, onEnterResult, onResetClick, onViewPoster, champion }) => {
+const Dashboard: React.FC<DashboardProps> = ({ matches, onEnterResult, onResetClick, onViewPoster, onShuffle, champion }) => {
   const completed = matches.filter(m => m.winnerId !== null).length;
   const total = matches.length;
   const progress = (completed / total) * 100;
@@ -66,16 +67,27 @@ const Dashboard: React.FC<DashboardProps> = ({ matches, onEnterResult, onResetCl
         </div>
       ) : (
         <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm p-5 sm:p-8 border border-slate-200">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
             <h2 className="text-lg sm:text-2xl font-black text-slate-800 uppercase tracking-tighter">
               {roundRobinDone ? 'Knockouts' : 'Round Robin'}
             </h2>
-            <button 
-              onClick={handleShare}
-              className="px-4 py-2 bg-indigo-50 text-indigo-600 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-indigo-100 transition-all flex items-center gap-2"
-            >
-              <span>🔗</span> Share Link
-            </button>
+            <div className="flex gap-2">
+              {!roundRobinDone && (
+                <button 
+                  onClick={onShuffle}
+                  className="px-3 py-2 bg-slate-100 text-slate-600 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-slate-200 transition-all flex items-center gap-1"
+                  title="Randomize match order"
+                >
+                  <span>🔀</span> Shuffle
+                </button>
+              )}
+              <button 
+                onClick={handleShare}
+                className="px-4 py-2 bg-indigo-50 text-indigo-600 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-indigo-100 transition-all flex items-center gap-2"
+              >
+                <span>🔗</span> Share Link
+              </button>
+            </div>
           </div>
           
           <div className="space-y-4">
